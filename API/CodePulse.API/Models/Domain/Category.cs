@@ -8,5 +8,4 @@
 
         public string UrlHandle { get; set; } = string.Empty;
     }
-
 }
