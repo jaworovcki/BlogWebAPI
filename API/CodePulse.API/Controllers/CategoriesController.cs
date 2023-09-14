@@ -1,6 +1,7 @@
 ﻿using CodePulse.API.Data;
 using CodePulse.API.Models.Domain;
 using CodePulse.API.Models.DTO;
+using CodePulse.API.Repositories.Intrerfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,14 +11,14 @@ namespace CodePulse.API.Controllers
 	[ApiController]
 	public class CategoriesController : ControllerBase
 	{
-		private readonly ApplicationDbContext _context;
+		private readonly ICategoryRepository _categoryRepository;
 
-		public CategoriesController(ApplicationDbContext context)
-        {
-			_context = context;
+		public CategoriesController(ICategoryRepository categoryRepository)
+		{
+			_categoryRepository = categoryRepository;
 		}
 
-        [HttpPost]
+		[HttpPost]
 		[ProducesResponseType(StatusCodes.Status201Created)]
         public async Task<ActionResult<CategoryDto>> CreateCategory(CreateCategoryRequestDto categoryDto)
         {
@@ -27,8 +28,7 @@ namespace CodePulse.API.Controllers
 				UrlHandle = categoryDto.UrlHandle
 			};
 
-			_context.Categories.Add(newCategory);
-			await _context.SaveChangesAsync();
+			await _categoryRepository.CreateAsync(newCategory);
 
 			var response = new CategoryDto()
 			{
@@ -41,23 +41,27 @@ namespace CodePulse.API.Controllers
 		}
 
 		[HttpGet("id", Name = nameof(GetCategoryById))]
+		[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CategoryDto))]
+		[ProducesResponseType(StatusCodes.Status404NotFound)]
 		public async Task<ActionResult<CategoryDto>> GetCategoryById(Guid id)
 		{
-			var category = await _context.Categories.FindAsync(id);
+			try
+			{
+				var category = await _categoryRepository.GetByIdAsync(id);
 
-			if (category == null)
+				var categoryDto = new CategoryDto
+				{
+					Id = category.Id,
+					Name = category.Name,
+					UrlHandle = category.UrlHandle
+				};
+
+				return Ok(categoryDto);
+			}
+			catch (ArgumentNullException)
 			{
 				return NotFound();
 			}
-
-			var categoryDto = new CategoryDto
-			{
-				Id = category.Id,
-				Name = category.Name,
-				UrlHandle = category.UrlHandle
-			};
-
-			return Ok(categoryDto);
 		}
     }
 }
