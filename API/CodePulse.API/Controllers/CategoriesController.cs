@@ -20,10 +20,10 @@ namespace CodePulse.API.Controllers
 
 		[HttpPost]
 		[ProducesResponseType(StatusCodes.Status201Created)]
-        public async Task<ActionResult<CategoryDto>> CreateCategory(CreateCategoryRequestDto categoryDto)
-        {
-            var newCategory = new Category
-            {
+		public async Task<ActionResult<CategoryDto>> CreateCategory(CreateCategoryRequestDto categoryDto)
+		{
+			var newCategory = new Category
+			{
 				Name = categoryDto.Name,
 				UrlHandle = categoryDto.UrlHandle
 			};
@@ -63,5 +63,21 @@ namespace CodePulse.API.Controllers
 				return NotFound();
 			}
 		}
-    }
+
+		[HttpGet]
+		[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<CategoryDto>))]
+		public async Task<ActionResult<IEnumerable<CategoryDto>>> GetAllCategories()
+		{
+			var categories = await _categoryRepository.GetAllAsync();
+
+			var categoriesDto = categories.Select(category => new CategoryDto
+			{
+				Id = category.Id,
+				Name = category.Name,
+				UrlHandle = category.UrlHandle
+			});
+
+			return Ok(categoriesDto);
+		}
+	}
 }

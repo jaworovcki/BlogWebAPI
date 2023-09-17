@@ -35,5 +35,10 @@ namespace CodePulse.API.Repositories.Implementations
 
 			return category;
 		}
+
+		public async Task<IEnumerable<Category>> GetAllAsync() 
+			=> await _dbContext.Categories
+				.AsNoTracking()
+				.ToListAsync();
 	}
 }
