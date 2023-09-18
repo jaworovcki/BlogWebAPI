@@ -40,10 +40,10 @@ namespace CodePulse.API.Controllers
 			return CreatedAtAction(nameof(GetCategoryById), new CategoryDto { Id = response.Id }, response);
 		}
 
-		[HttpGet("id", Name = nameof(GetCategoryById))]
+		[HttpGet("{id}", Name = nameof(GetCategoryById))]
 		[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CategoryDto))]
 		[ProducesResponseType(StatusCodes.Status404NotFound)]
-		public async Task<ActionResult<CategoryDto>> GetCategoryById(Guid id)
+		public async Task<ActionResult<CategoryDto>> GetCategoryById([FromRoute] Guid id)
 		{
 			try
 			{
@@ -78,6 +78,54 @@ namespace CodePulse.API.Controllers
 			});
 
 			return Ok(categoriesDto);
+		}
+
+		[HttpDelete("{id}")]
+		[ProducesResponseType(StatusCodes.Status204NoContent)]
+		[ProducesResponseType(StatusCodes.Status404NotFound)]
+		public async Task<IActionResult> DeleteCategoryById([FromRoute] Guid id)
+		{
+			try
+			{
+				await _categoryRepository.DeleteByIdAsync(id);
+
+				return NoContent();
+			}
+			catch (ArgumentNullException)
+			{
+				return NotFound();
+			}
+		}
+
+		[HttpPut("{id}")]
+		[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CategoryDto))]
+		[ProducesResponseType(StatusCodes.Status404NotFound)]
+		public async Task<ActionResult<CategoryDto>> UpdateCategory([FromRoute] Guid id, UpdateCategoryRequestDto request)
+		{
+			try
+			{
+				var category = new Category
+				{
+					Id = id,
+					Name = request.Name,
+					UrlHandle = request.UrlHandle
+				};
+
+				var updatedCategory = await _categoryRepository.UpdateAsync(category);
+
+				var response = new CategoryDto
+				{
+					Id = updatedCategory.Id,
+					Name = updatedCategory.Name,
+					UrlHandle = updatedCategory.UrlHandle
+				};
+
+				return Ok(response);
+			}
+			catch (ArgumentNullException)
+			{
+				return NotFound();
+			}
 		}
 	}
 }

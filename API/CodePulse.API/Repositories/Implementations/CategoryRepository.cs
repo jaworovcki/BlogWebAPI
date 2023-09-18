@@ -40,5 +40,22 @@ namespace CodePulse.API.Repositories.Implementations
 			=> await _dbContext.Categories
 				.AsNoTracking()
 				.ToListAsync();
+
+		public async Task DeleteByIdAsync(Guid Id)
+		{
+			var category = await GetByIdAsync(Id);
+
+			_dbContext.Categories.Remove(category);
+			await _dbContext.SaveChangesAsync();
+		}
+
+		public async Task<Category> UpdateAsync(Category category)
+		{
+			var categoryToUpdate = await GetByIdAsync(category.Id);
+			_dbContext.Entry(categoryToUpdate).CurrentValues.SetValues(category);
+
+			await _dbContext.SaveChangesAsync();
+			return categoryToUpdate;
+		}
 	}
 }
