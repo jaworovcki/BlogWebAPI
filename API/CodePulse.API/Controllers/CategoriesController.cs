@@ -100,7 +100,7 @@ namespace CodePulse.API.Controllers
 		[HttpPut("{id}")]
 		[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CategoryDto))]
 		[ProducesResponseType(StatusCodes.Status404NotFound)]
-		public async Task<ActionResult<CategoryDto>> UpdateCategory([FromRoute] Guid id, UpdateCategoryRequestDto request)
+		public async Task<ActionResult<CategoryDto>> UpdateCategory([FromRoute] Guid id, [FromBody] UpdateCategoryRequestDto request)
 		{
 			try
 			{
