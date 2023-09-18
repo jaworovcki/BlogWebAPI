@@ -48,7 +48,17 @@ namespace CodePulse.API.Repositories.Implementations
 			{
 				throw new ArgumentNullException("Incorrect id of the category", nameof(Id));
 			}
+
 			await _dbContext.SaveChangesAsync();
+		}
+
+		public async Task<Category> UpdateAsync(Category category)
+		{
+			var categoryToUpdate = await GetByIdAsync(category.Id);
+			_dbContext.Entry(categoryToUpdate).CurrentValues.SetValues(category);
+
+			await _dbContext.SaveChangesAsync();
+			return categoryToUpdate;
 		}
 	}
 }
