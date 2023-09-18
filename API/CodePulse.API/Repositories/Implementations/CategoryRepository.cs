@@ -40,5 +40,15 @@ namespace CodePulse.API.Repositories.Implementations
 			=> await _dbContext.Categories
 				.AsNoTracking()
 				.ToListAsync();
+
+		public async Task DeleteByIdAsync(Guid Id)
+		{
+			var category = await _dbContext.Categories.FindAsync(Id);
+			if (category is null)
+			{
+				throw new ArgumentNullException("Incorrect id of the category", nameof(Id));
+			}
+			await _dbContext.SaveChangesAsync();
+		}
 	}
 }

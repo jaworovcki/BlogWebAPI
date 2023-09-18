@@ -79,5 +79,22 @@ namespace CodePulse.API.Controllers
 
 			return Ok(categoriesDto);
 		}
+
+		[HttpDelete]
+		[ProducesResponseType(StatusCodes.Status204NoContent)]
+		public async Task<IActionResult> DeleteCategoryById(Guid id)
+		{
+			try
+			{
+				await _categoryRepository.DeleteByIdAsync(id);
+
+				return NoContent();
+			}
+			catch (ArgumentNullException)
+			{
+				return NotFound();
+			}
+		}
+
 	}
 }
