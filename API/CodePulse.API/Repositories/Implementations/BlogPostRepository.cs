@@ -31,6 +31,7 @@ namespace CodePulse.API.Repositories.Implementations
 		}
 
 		public async Task<IEnumerable<BlogPost>> GetAllAsync() => await _dbContext.BlogPosts
+				.Include(blogPost => blogPost.Categories)
 				.AsNoTracking()
 				.ToListAsync();
 
@@ -41,6 +42,12 @@ namespace CodePulse.API.Repositories.Implementations
 			if (blogPost == null)
 			{
 				throw new ArgumentNullException("Incorrect id of the blog post", nameof(id));
+			}
+			else
+			{
+				await _dbContext.Entry(blogPost)
+					.Collection(blogPost => blogPost.Categories)
+					.LoadAsync();
 			}
 
 			return blogPost;

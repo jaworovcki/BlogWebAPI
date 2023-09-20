@@ -11,9 +11,12 @@ namespace CodePulse.API.Controllers
 	public class BlogPostsController : ControllerBase
 	{
         private readonly IBlogPostRepository _blogPostRepository;
-		public BlogPostsController(IBlogPostRepository blogPostRepository)
+		private readonly ICategoryRepository _categoryRepository;
+
+		public BlogPostsController(IBlogPostRepository blogPostRepository, ICategoryRepository categoryRepository)
 		{
 			_blogPostRepository = blogPostRepository;
+			_categoryRepository = categoryRepository;
 		}
 
 		[HttpPost]
@@ -29,8 +32,18 @@ namespace CodePulse.API.Controllers
 				Description = requestDto.Description,
 				FeatureImageURl = requestDto.FeatureImageURl,
 				IsVisible = requestDto.IsVisible,
-				UrlHandle = requestDto.UrlHandle
+				UrlHandle = requestDto.UrlHandle,
+				Categories = new List<Category>(),
 			};
+
+			foreach (var categoryId in requestDto.Categories)
+			{
+				var category = await _categoryRepository.GetByIdAsync(categoryId);
+				if (category is not null)
+				{
+					newBlogPost.Categories.Add(category);
+				}
+			}
 
 			await _blogPostRepository.CreateAsync(newBlogPost);
 
@@ -44,7 +57,13 @@ namespace CodePulse.API.Controllers
 				Description = newBlogPost.Description,
 				FeatureImageURl = newBlogPost.FeatureImageURl,
 				IsVisible = newBlogPost.IsVisible,
-				UrlHandle = newBlogPost.UrlHandle
+				UrlHandle = newBlogPost.UrlHandle,
+				Categories = newBlogPost.Categories.Select(category => new CategoryDto
+				{
+					Id = category.Id,
+					Name = category.Name,
+					UrlHandle = category.UrlHandle
+				}).ToList()
 			};
 
 			return CreatedAtAction(nameof(GetBlogPostById), new BlogPostDto { Id = response.Id }, response);
@@ -69,7 +88,13 @@ namespace CodePulse.API.Controllers
 					Description = blogPost.Description,
 					FeatureImageURl = blogPost.FeatureImageURl,
 					IsVisible = blogPost.IsVisible,
-					UrlHandle = blogPost.UrlHandle
+					UrlHandle = blogPost.UrlHandle,
+					Categories = blogPost.Categories.Select(category => new CategoryDto
+					{
+						Id = category.Id,
+						Name = category.Name,
+						UrlHandle = category.UrlHandle
+					}).ToList()
 				};
 
 				return Ok(blogPostDto);
@@ -96,7 +121,13 @@ namespace CodePulse.API.Controllers
 				Description = blogPost.Description,
 				FeatureImageURl = blogPost.FeatureImageURl,
 				IsVisible = blogPost.IsVisible,
-				UrlHandle = blogPost.UrlHandle
+				UrlHandle = blogPost.UrlHandle,
+				Categories = blogPost.Categories.Select(category => new CategoryDto
+				{
+					Id = category.Id,
+					Name = category.Name,
+					UrlHandle = category.UrlHandle
+				}).ToList(),
 			});
 
 			return Ok(blogPostsDto);
