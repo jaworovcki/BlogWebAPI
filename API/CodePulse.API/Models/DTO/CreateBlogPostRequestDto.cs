@@ -18,6 +18,6 @@
 
 		public bool IsVisible { get; set; }
 
-		public Guid[] Categories { get; set; }
+		public List<Guid> Categories { get; set; } = new();
     }
 }

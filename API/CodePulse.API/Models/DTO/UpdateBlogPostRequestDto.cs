@@ -17,5 +17,7 @@
 		public string Author { get; set; } = string.Empty;
 
 		public bool IsVisible { get; set; }
+
+		public List<Guid> Categories { get; set; } = new();
 	}
 }

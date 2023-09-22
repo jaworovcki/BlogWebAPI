@@ -136,7 +136,7 @@ namespace CodePulse.API.Controllers
 		[HttpDelete("{id}")]
 		[ProducesResponseType(StatusCodes.Status204NoContent)]
 		[ProducesResponseType(StatusCodes.Status404NotFound)]
-		public async Task<ActionResult> DeleteBlogPost([FromRoute] Guid id)
+		public async Task<IActionResult> DeleteBlogPost([FromRoute] Guid id)
 		{
 			try
 			{
@@ -150,7 +150,7 @@ namespace CodePulse.API.Controllers
 		}
 
 		[HttpPut("{id}")]
-		[ProducesResponseType(StatusCodes.Status200OK)]
+		[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(BlogPostDto))]
 		[ProducesResponseType(StatusCodes.Status404NotFound)]
 		public async Task<ActionResult<BlogPostDto>> UpdateBlogPost([FromRoute] Guid id, [FromBody] UpdateBlogPostRequestDto requestDto)
 		{
@@ -166,8 +166,22 @@ namespace CodePulse.API.Controllers
 					Description = requestDto.Description,
 					FeatureImageURl = requestDto.FeatureImageURl,
 					IsVisible = requestDto.IsVisible,
-					UrlHandle = requestDto.UrlHandle
+					UrlHandle = requestDto.UrlHandle,
+					Categories = new List<Category>(),
 				};
+
+				foreach (var categoryId in requestDto.Categories)
+				{
+					var category = await _categoryRepository.GetByIdAsync(categoryId);
+					if (category is not null)
+					{
+						blogPost.Categories.Add(category);
+					}
+					else
+					{
+						throw new ArgumentNullException("Incorrect category Id", nameof(categoryId));
+					}
+				}
 
 				await _blogPostRepository.UpdateAsync(blogPost);
 
@@ -181,7 +195,13 @@ namespace CodePulse.API.Controllers
 					Description = blogPost.Description,
 					FeatureImageURl = blogPost.FeatureImageURl,
 					IsVisible = blogPost.IsVisible,
-					UrlHandle = blogPost.UrlHandle
+					UrlHandle = blogPost.UrlHandle,
+					Categories = blogPost.Categories.Select(category => new CategoryDto
+					{
+						Id = category.Id,
+						Name = category.Name,
+						UrlHandle = category.UrlHandle
+					}).ToList()
 				};
 
 				return Ok(response);
