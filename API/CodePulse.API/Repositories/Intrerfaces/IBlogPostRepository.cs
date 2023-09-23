@@ -13,5 +13,7 @@ namespace CodePulse.API.Repositories.Intrerfaces
 		Task<BlogPost> UpdateAsync(BlogPost blogPost);
 
 		Task DeleteAsync(Guid id);
+
+		Task<BlogPost> GetByUrlHandleAsync(string urlHandle);
 	}
 }

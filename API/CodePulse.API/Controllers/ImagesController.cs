@@ -49,7 +49,7 @@ namespace CodePulse.API.Controllers
 		}
 
 		[HttpGet("{id}", Name = nameof(GetImage))]
-		[ProducesResponseType(StatusCodes.Status200OK)]
+		[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(BlogImageDto))]
 		[ProducesResponseType(StatusCodes.Status404NotFound)]
 		public async Task<ActionResult<BlogImageDto>> GetImage(Guid id)
 		{

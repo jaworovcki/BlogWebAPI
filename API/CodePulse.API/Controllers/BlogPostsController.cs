@@ -69,7 +69,7 @@ namespace CodePulse.API.Controllers
 			return CreatedAtAction(nameof(GetBlogPostById), new BlogPostDto { Id = response.Id }, response);
 		}
 
-		[HttpGet("{id}", Name = nameof(GetBlogPostById))]
+		[HttpGet("{id:Guid}", Name = nameof(GetBlogPostById))]
 		[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(BlogPostDto))]
 		[ProducesResponseType(StatusCodes.Status404NotFound)]
 		public async Task<ActionResult<BlogPostDto>> GetBlogPostById([FromRoute] Guid id)
@@ -132,6 +132,43 @@ namespace CodePulse.API.Controllers
 
 			return Ok(blogPostsDto);
 		}
+
+		[HttpGet("{urlHandle}")]
+		[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(BlogPostDto))]
+		[ProducesResponseType(StatusCodes.Status404NotFound)]
+		public async Task<ActionResult<BlogPostDto>> GetBlogPostByUrlHandle([FromRoute] string urlHandle)
+		{
+			try
+			{
+				var blogPost = await _blogPostRepository.GetByUrlHandleAsync(urlHandle);
+
+				var blogPostDto = new BlogPostDto
+				{
+					Id = blogPost.Id,
+					Author = blogPost.Author,
+					Title = blogPost.Title,
+					Content = blogPost.Content,
+					CreatedDate = blogPost.CreatedDate,
+					Description = blogPost.Description,
+					FeatureImageURl = blogPost.FeatureImageURl,
+					IsVisible = blogPost.IsVisible,
+					UrlHandle = blogPost.UrlHandle,
+					Categories = blogPost.Categories.Select(category => new CategoryDto
+					{
+						Id = category.Id,
+						Name = category.Name,
+						UrlHandle = category.UrlHandle
+					}).ToList()
+				};
+
+				return Ok(blogPostDto);
+			}
+			catch (ArgumentNullException)
+			{
+				return NotFound();
+			}
+		}
+
 
 		[HttpDelete("{id}")]
 		[ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -211,6 +248,5 @@ namespace CodePulse.API.Controllers
 				return NotFound();
 			}
 		}
-
 	}
 }

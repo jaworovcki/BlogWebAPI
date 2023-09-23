@@ -53,6 +53,25 @@ namespace CodePulse.API.Repositories.Implementations
 			return blogPost;
 		}
 
+		public async Task<BlogPost> GetByUrlHandleAsync(string urlHandle)
+		{
+			var blogPost = await _dbContext.BlogPosts
+				.FirstOrDefaultAsync(blogPost => blogPost.UrlHandle == urlHandle);
+
+			if (blogPost == null)
+			{
+				throw new ArgumentNullException("Incorrect url handle of the blog post", nameof(urlHandle));
+			}
+			else
+			{
+				await _dbContext.Entry(blogPost)
+					.Collection(blogPost => blogPost.Categories)
+					.LoadAsync();
+			}
+
+			return blogPost;
+		}
+
 		public async Task<BlogPost> UpdateAsync(BlogPost blogPost)
 		{
 			var blogPostToUpdate = await GetAsync(blogPost.Id);
