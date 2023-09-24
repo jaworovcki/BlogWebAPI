@@ -1,6 +1,7 @@
 ﻿using CodePulse.API.Models.Domain;
 using CodePulse.API.Models.DTO;
 using CodePulse.API.Repositories.Intrerfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,6 +9,7 @@ namespace CodePulse.API.Controllers
 {
 	[Route("api/[controller]")]
 	[ApiController]
+	[Authorize]
 	public class BlogPostsController : ControllerBase
 	{
         private readonly IBlogPostRepository _blogPostRepository;
@@ -21,6 +23,7 @@ namespace CodePulse.API.Controllers
 
 		[HttpPost]
 		[ProducesResponseType(StatusCodes.Status201Created)]
+		[Authorize(Roles = "Admin")]
 		public async Task<ActionResult<BlogPostDto>> CreateBlogPost(CreateBlogPostRequestDto requestDto)
 		{
 			var newBlogPost = new BlogPost
@@ -173,6 +176,7 @@ namespace CodePulse.API.Controllers
 		[HttpDelete("{id}")]
 		[ProducesResponseType(StatusCodes.Status204NoContent)]
 		[ProducesResponseType(StatusCodes.Status404NotFound)]
+		[Authorize(Roles = "Admin")]
 		public async Task<IActionResult> DeleteBlogPost([FromRoute] Guid id)
 		{
 			try
@@ -189,6 +193,7 @@ namespace CodePulse.API.Controllers
 		[HttpPut("{id}")]
 		[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(BlogPostDto))]
 		[ProducesResponseType(StatusCodes.Status404NotFound)]
+		[Authorize(Roles = "Admin")]
 		public async Task<ActionResult<BlogPostDto>> UpdateBlogPost([FromRoute] Guid id, [FromBody] UpdateBlogPostRequestDto requestDto)
 		{
 			try

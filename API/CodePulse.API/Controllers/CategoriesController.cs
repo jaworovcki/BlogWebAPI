@@ -10,7 +10,7 @@ namespace CodePulse.API.Controllers
 {
 	[Route("api/[controller]")]
 	[ApiController]
-	[Authorize]
+	[Authorize] 
 	public class CategoriesController : ControllerBase
 	{
 		private readonly ICategoryRepository _categoryRepository;
