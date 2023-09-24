@@ -2,6 +2,7 @@
 using CodePulse.API.Models.Domain;
 using CodePulse.API.Models.DTO;
 using CodePulse.API.Repositories.Intrerfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,6 +10,7 @@ namespace CodePulse.API.Controllers
 {
 	[Route("api/[controller]")]
 	[ApiController]
+	[Authorize] 
 	public class CategoriesController : ControllerBase
 	{
 		private readonly ICategoryRepository _categoryRepository;
@@ -20,6 +22,7 @@ namespace CodePulse.API.Controllers
 
 		[HttpPost]
 		[ProducesResponseType(StatusCodes.Status201Created)]
+		[Authorize(Roles = "Admin")]
 		public async Task<ActionResult<CategoryDto>> CreateCategory(CreateCategoryRequestDto categoryDto)
 		{
 			var newCategory = new Category
@@ -83,6 +86,7 @@ namespace CodePulse.API.Controllers
 		[HttpDelete("{id}")]
 		[ProducesResponseType(StatusCodes.Status204NoContent)]
 		[ProducesResponseType(StatusCodes.Status404NotFound)]
+		[Authorize(Roles = "Admin")]
 		public async Task<IActionResult> DeleteCategoryById([FromRoute] Guid id)
 		{
 			try
@@ -100,7 +104,8 @@ namespace CodePulse.API.Controllers
 		[HttpPut("{id}")]
 		[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CategoryDto))]
 		[ProducesResponseType(StatusCodes.Status404NotFound)]
-		public async Task<ActionResult<CategoryDto>> UpdateCategory([FromRoute] Guid id, UpdateCategoryRequestDto request)
+		[Authorize(Roles = "Admin")]
+		public async Task<ActionResult<CategoryDto>> UpdateCategory([FromRoute] Guid id, [FromBody] UpdateCategoryRequestDto request)
 		{
 			try
 			{
